@@ -17,6 +17,7 @@ declare global {
 })
 export class AppComponent  {
   results: string[] = [];
+  @ViewChild('key') key: ElementRef;
   @ViewChild('chords') chords: ElementRef;
   @ViewChild('vexflow') vexflow: ElementRef;
   @ViewChild('trigger') trigger: ElementRef;
@@ -24,12 +25,12 @@ export class AppComponent  {
   
   submit(): false {
     const numerals = this.chords.nativeElement.value.split(' ');
-    const scale = Scale.Major.notes;
+    const scale = Scale.transpose(Scale.Major.notes, this.key.nativeElement.value);
     const constraints = numerals.map(numeral => new IncompleteChord({romanNumeral: new RomanNumeral(numeral, scale)}));
-    const result = Harmony.harmonizeAll(scale, constraints, new RomanNumeral('I', scale), [...Progression.Major.basic, ...Progression.Major.basicInversions, ...Progression.Major.dominantSevenths, ...Progression.Major.basicPredominant, ...Progression.Major.subdominantSevenths, ...Progression.Major.submediant, ...Progression.Major.cad64, ...Progression.Major.tonicSubstitutes]);
+    const result = Harmony.harmonizeAll({scale, constraints, enabled: [...Progression.Major.basic, ...Progression.Major.basicInversions, ...Progression.Major.dominantSevenths, ...Progression.Major.basicPredominant, ...Progression.Major.subdominantSevenths, ...Progression.Major.submediant, ...Progression.Major.cad64, ...Progression.Major.tonicSubstitutes]});
     
-    if(result) {
-      for(let chord of result) {
+    if(result.solution) {
+      for(let chord of result.solution) {
         this.results.push(chord.voices.map(note => note.name));
       } 
       
@@ -44,7 +45,7 @@ export class AppComponent  {
 
       console.log(result);
       
-      const [sopranoVoice, altoVoice, tenorVoice, bassVoice, text] = result
+      const [sopranoVoice, altoVoice, tenorVoice, bassVoice, text] = result.solution
       .reduce((acc, chord) => {
         const map = (note: AbsoluteNote, stem_direction, clef) => {
           let staveNote = vf.StaveNote({ keys: [note.letterName + Accidental.toString(note.accidental) + '/' + note.octavePosition], stem_direction, clef, duration: 'q' });
@@ -78,8 +79,8 @@ export class AppComponent  {
         note.setJustification(Vex.Flow.TextNote.Justification.CENTER);
       });
       
-      system.addStave({ voices: [sopranoVoice, altoVoice] }).addKeySignature('C').setClef('treble').setTimeSignature('4/4');
-      system.addStave({ voices: [tenorVoice, bassVoice, text] }).addKeySignature('C').setClef('bass').setTimeSignature('4/4');
+      system.addStave({ voices: [sopranoVoice, altoVoice] }).addKeySignature(this.key.nativeElement.value).setClef('treble').setTimeSignature('4/4');
+      system.addStave({ voices: [tenorVoice, bassVoice, text] }).addKeySignature(this.key.nativeElement.value).setClef('bass').setTimeSignature('4/4');
 
       system.addConnector().setType(Vex.Flow.StaveConnector.type.BRACE);
       system.addConnector().setType(Vex.Flow.StaveConnector.type.SINGLE_LEFT);
@@ -96,8 +97,8 @@ export class AppComponent  {
         const bass = new Tone.Synth().toMaster();
         soprano.context.resume();
         
-        if(result != null){
-          for(let x = 0; x <= result.length; x++) {
+        if(result.solution != null){
+          for(let x = 0; x <= result.solution.length; x++) {
             setTimeout((x, chord) => {
               soprano.triggerRelease();
               if (chord?.voices[0]) {
@@ -127,12 +128,12 @@ export class AppComponent  {
                 bassVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
                 bassVoice.draw();
               }
-            }, x * 1000, x, result[x]);
+            }, x * 1000, x, result.solution[x]);
           }
         }
       };
     } else {
-      this.error.nativeElement.innerHTML = 'Could not find solution for ' + numerals;
+      this.error.nativeElement.innerHTML = 'Could not find solution for ' + numerals + ' got to ' + numerals[result.reached];
     }
     return false;
   }
