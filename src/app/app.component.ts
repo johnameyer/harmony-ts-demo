@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AbsoluteNote, IncompleteChord, Scale, Harmony, RomanNumeral, Progression, Accidental, ChordQuality, Interval, IntervalQuality } from 'harmony-ts';
-import Vex from "vexflow";
+import Vex from 'vexflow';
 
 declare global {
   namespace Vex {
@@ -22,48 +22,48 @@ export class AppComponent  {
   @ViewChild('vexflow') vexflow: ElementRef;
   @ViewChild('trigger') trigger: ElementRef;
   @ViewChild('error') error: ElementRef;
-  
+
   submit(): false {
     const numerals = this.chords.nativeElement.value.split(' ');
     const scale = Scale.transpose(Scale.Major.notes, this.key.nativeElement.value);
     const constraints = numerals.map(numeral => new IncompleteChord({romanNumeral: new RomanNumeral(numeral, scale)}));
-    const result = Harmony.harmonizeAll({scale, constraints, enabled: [...Progression.Major.basic, ...Progression.Major.basicInversions, ...Progression.Major.dominantSevenths, ...Progression.Major.basicPredominant, ...Progression.Major.subdominantSevenths, ...Progression.Major.submediant, ...Progression.Major.cad64, ...Progression.Major.tonicSubstitutes]});
-    
-    if(result.solution) {
-      for(let chord of result.solution) {
+    const result = Harmony.harmonizeAll({scale, constraints, greedy: false, enabled: [...Progression.Major.basic, ...Progression.Major.basicInversions, ...Progression.Major.dominantSevenths, ...Progression.Major.basicPredominant, ...Progression.Major.subdominantSevenths, ...Progression.Major.submediant, ...Progression.Major.cad64, ...Progression.Major.tonicSubstitutes]});
+
+    if (result.solution) {
+      for (const chord of result.solution) {
         this.results.push(chord.voices.map(note => note.name));
-      } 
-      
-      let vf = new Vex.Flow.Factory({
+      }
+
+      const vf = new Vex.Flow.Factory({
         renderer: {elementId: 'vexflow', width: 1000, height: 300}
       });
-      
-      var system = vf.System({
+
+      const system = vf.System({
         x: 30,
         width: 500,
       });
 
       console.log(result);
-      
+
       const [sopranoVoice, altoVoice, tenorVoice, bassVoice, text] = result.solution
       .reduce((acc, chord) => {
         const map = (note: AbsoluteNote, stem_direction, clef) => {
-          let staveNote = vf.StaveNote({ keys: [note.letterName + Accidental.toString(note.accidental) + '/' + note.octavePosition], stem_direction, clef, duration: 'q' });
-          if(note.accidental) {
+          const staveNote = vf.StaveNote({ keys: [note.letterName + Accidental.toString(note.accidental) + '/' + note.octavePosition], stem_direction, clef, duration: 'q' });
+          if (note.accidental && scale.indexOf(note.simpleName) == -1) {
             staveNote.addAccidental(0, vf.Accidental({ type: Accidental.toString(note.accidental)}));
           }
           return staveNote;
-        }
+        };
         acc[0].push(map(chord.voices[0], 1, 'treble'));
         acc[1].push(map(chord.voices[1], -1, 'treble'));
         acc[2].push(map(chord.voices[2], 1, 'bass'));
         acc[3].push(map(chord.voices[3], -1, 'bass'));
-        let textNote = vf.TextNote({ text: chord.romanNumeral.name.match('[viVI]+')[0], duration: 'q', superscript: '', subscript: '' });
-        if(chord.romanNumeral.quality == ChordQuality.DIMINISHED) {
-          if(chord.romanNumeral.intervals.find(Interval.ofSize('7')) == IntervalQuality.MINOR) {
+        const textNote = vf.TextNote({ text: chord.romanNumeral.name.match('[viVI]+')[0], duration: 'q', superscript: '', subscript: '' });
+        if (chord.romanNumeral.quality == ChordQuality.DIMINISHED) {
+          if (chord.romanNumeral.intervals.find(Interval.ofSize('7')) == IntervalQuality.MINOR) {
             textNote.superscript = Vex.Flow.unicode['o-with-slash'];
           } else {
-            textNote.superscript = Vex.Flow.unicode['circle'];
+            textNote.superscript = Vex.Flow.unicode.circle;
           }
         }
         textNote.superscript += chord.romanNumeral.inversionSymbol[0];
@@ -72,22 +72,22 @@ export class AppComponent  {
         return acc;
       }, [[], [], [], [], []])
       .map(tickables => vf.Voice().setMode(Vex.Flow.Voice.Mode.SOFT).addTickables(tickables));
-      
+
       text.getTickables().forEach((note) => {
         note.font = { family: 'Serif', size: 15, weight: '' };
         note.setLine(13);
         note.setJustification(Vex.Flow.TextNote.Justification.CENTER);
       });
-      
+
       system.addStave({ voices: [sopranoVoice, altoVoice] }).addKeySignature(this.key.nativeElement.value).setClef('treble').setTimeSignature('4/4');
       system.addStave({ voices: [tenorVoice, bassVoice, text] }).addKeySignature(this.key.nativeElement.value).setClef('bass').setTimeSignature('4/4');
 
       system.addConnector().setType(Vex.Flow.StaveConnector.type.BRACE);
       system.addConnector().setType(Vex.Flow.StaveConnector.type.SINGLE_LEFT);
       system.addConnector().setType(Vex.Flow.StaveConnector.type.SINGLE_RIGHT);
-      
+
       vf.draw();
-      
+
       this.trigger.nativeElement.onclick = null;
       this.trigger.nativeElement.onclick = async () => {
         const Tone = await import('tone');
@@ -96,9 +96,9 @@ export class AppComponent  {
         const tenor = new Tone.Synth().toMaster();
         const bass = new Tone.Synth().toMaster();
         soprano.context.resume();
-        
-        if(result.solution != null){
-          for(let x = 0; x <= result.solution.length; x++) {
+
+        if (result.solution != null) {
+          for (let x = 0; x <= result.solution.length; x++) {
             setTimeout((x, chord) => {
               soprano.triggerRelease();
               if (chord?.voices[0]) {
@@ -133,7 +133,7 @@ export class AppComponent  {
         }
       };
     } else {
-      this.error.nativeElement.innerHTML = 'Could not find solution for ' + numerals + ' got to ' + numerals[result.reached];
+      this.error.nativeElement.innerHTML = 'Could not find solution for ' + numerals + ' got to ' + numerals[result.furthest] + ' @ ' + result.furthest;
     }
     return false;
   }
