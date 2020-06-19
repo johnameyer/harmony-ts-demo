@@ -1,11 +1,22 @@
 <form>
-    <label>Enter key: </label>
-    <input #key>
-    <p style="color: grey; font-size: 10pt">For example: B</p>
-    <br>
-    <label>Enter Roman Numerals (starting with I): </label>
-    <input #chords>
-    <p style="color: grey; font-size: 10pt">For example: I ii65 V V42 I6 V43 I ii42 V65 I</p>
+    <div class="d-block">
+        <label>Enter key: </label>
+        <input #key>
+        <p style="color: grey; font-size: 10pt">For example: Bm</p>
+    </div>
+    <div class="d-block">
+        <label>Enter Roman Numerals: </label>
+        <input #chords>
+        <p style="color: grey; font-size: 10pt">For example: I ii65 V V42 I6 V43 I ii42 V65 I</p>
+    </div>
+    <div class="d-block">
+        <label>Enter Starting Spacing (optional): </label>
+        <input #spacing>
+    </div>
+    <div class="d-block">
+        <label>Check progressions: </label>
+        <input #useProgressions type="checkbox">
+    </div>
     <button (click)="submit()">Submit</button>
 </form>
 <p #error></p>
