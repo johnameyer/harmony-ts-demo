@@ -5,14 +5,21 @@
         <p style="color: grey; font-size: 10pt">For example: Bm</p>
     </div>
     <div class="d-block">
-        <label>Enter Roman Numerals: </label>
+        <label>Enter Roman Numerals (optional): </label>
         <input #chords>
         <p style="color: grey; font-size: 10pt">For example: I ii65 V V42 I6 V43 I ii42 V65 I</p>
     </div>
     <div class="d-block">
+        <label>Enter Soprano Line (optional): </label>
+        <input #soprano>
+        <p style="color: grey; font-size: 10pt">For example: C5 B4 C5 D5 E5 F5 E5</p>
+    </div>
+    <div class="d-block">
         <label>Enter Starting Spacing (optional): </label>
         <input #spacing>
+        <p style="color: grey; font-size: 10pt">For example: C5 G4 E4 C4</p>
     </div>
+    <p style="color: grey; font-size: 10pt">Note that spacing, if provided, overrides soprano for first chord</p>
     <div class="d-block">
         <label>Check progressions: </label>
         <input #useProgressions type="checkbox">
@@ -20,5 +27,6 @@
     <button (click)="submit()">Submit</button>
 </form>
 <p #error></p>
-<div #vexflow id="vexflow"></div>
-<button #trigger>Play</button>
+<ng-container *ngFor="let result of results.reverse()">
+    <harmony-ts-demo-solution-renderer [result]="result"></harmony-ts-demo-solution-renderer>
+</ng-container>
