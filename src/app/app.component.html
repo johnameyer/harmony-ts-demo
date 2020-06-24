@@ -27,6 +27,6 @@
     <button (click)="submit()">Submit</button>
 </form>
 <p #error></p>
-<ng-container *ngFor="let result of results.reverse()">
+<ng-container *ngFor="let result of results.slice().reverse()">
     <harmony-ts-demo-solution-renderer [result]="result"></harmony-ts-demo-solution-renderer>
 </ng-container>
