@@ -3,14 +3,6 @@ import { HarmonizedChord, AbsoluteNote, IncompleteChord, Scale, Harmony, RomanNu
 
 import Vex from 'vexflow';
 
-declare global {
-  namespace Vex {
-    namespace Flow {
-      const Factory: any;
-    }
-  }
-}
-
 @Component({
   selector: 'harmony-ts-demo-solution-renderer',
   templateUrl: './solution-renderer.component.html',
@@ -42,6 +34,7 @@ export class SolutionRendererComponent implements AfterViewInit {
     console.log(this.result);
 
     // hacky but works under current scale key system
+    //@ts-ignore
     const scale = this.result[0].romanNumeral._scale;
     const key = scale[0];
 
@@ -59,7 +52,7 @@ export class SolutionRendererComponent implements AfterViewInit {
       acc[1].push(map(chord.voices[1], -1, 'treble'));
       acc[2].push(map(chord.voices[2], 1, 'bass'));
       acc[3].push(map(chord.voices[3], -1, 'bass'));
-      const textNote = vf.TextNote({ text: chord.romanNumeral.name.match('[viVI]+')[0], duration: 'q', superscript: '', subscript: '' });
+      const textNote: any = vf.TextNote({ text: chord.romanNumeral.name.match('[viVI]+')[0], duration: 'q', superscript: '', subscript: '' });
       if (chord.romanNumeral.quality == ChordQuality.DIMINISHED) {
         if (chord.romanNumeral.intervals?.find(Interval.ofSize('7'))?.quality == IntervalQuality.MINOR) {
           textNote.superscript = Vex.Flow.unicode['o-with-slash'];
@@ -76,16 +69,19 @@ export class SolutionRendererComponent implements AfterViewInit {
       acc[4].push(textNote);
       return acc;
     }, [[], [], [], [], []])
-    .map(tickables => vf.Voice().setMode(Vex.Flow.Voice.Mode.SOFT).addTickables(tickables));
+    .map(tickables => vf.Voice(undefined).setMode(Vex.Flow.Voice.Mode.SOFT).addTickables(tickables));
 
     text.getTickables().forEach((note) => {
+      //@ts-ignore
       note.font = { family: 'Serif', size: 15, weight: '' };
+      //@ts-ignore
       note.setLine(13);
+      //@ts-ignore
       note.setJustification(Vex.Flow.TextNote.Justification.CENTER);
     });
 
-    system.addStave({ voices: [sopranoVoice, altoVoice] }).addKeySignature(key).setClef('treble').setTimeSignature('4/4');
-    system.addStave({ voices: [tenorVoice, bassVoice, text] }).addKeySignature(key).setClef('bass').setTimeSignature('4/4');
+    system.addStave({ voices: [sopranoVoice, altoVoice] }).addKeySignature(key).addClef('treble').addTimeSignature('4/4');
+    system.addStave({ voices: [tenorVoice, bassVoice, text] }).addKeySignature(key).addClef('bass').addTimeSignature('4/4');
 
     system.addConnector().setType(Vex.Flow.StaveConnector.type.BRACE);
     system.addConnector().setType(Vex.Flow.StaveConnector.type.SINGLE_LEFT);
