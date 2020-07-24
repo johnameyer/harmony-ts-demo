@@ -13,6 +13,7 @@ export class AppComponent  {
   @ViewChild('soprano') soprano: ElementRef;
   @ViewChild('spacing') spacing: ElementRef;
   @ViewChild('useProgressions') useProgressions: ElementRef;
+  @ViewChild('endCadence') endCadence: ElementRef;
   @ViewChild('error') error: ElementRef;
 
   current: any;
@@ -28,6 +29,9 @@ export class AppComponent  {
         .map((_, i) => new IncompleteChord({romanNumeral: numerals[i] ? new RomanNumeral(numerals[i], scale) : undefined, voices: soprano[i] ? [new AbsoluteNote(soprano[i]), undefined, undefined, undefined] : undefined}));
       if(this.spacing.nativeElement.value) {
         constraints[0] = new IncompleteChord({romanNumeral: new RomanNumeral(numerals[0], scale), voices: this.spacing.nativeElement.value.split(' ').map(note => new AbsoluteNote(note))});
+      }
+      if(this.endCadence.nativeElement.value) {
+        constraints[constraints.length - 1].flags[this.endCadence.nativeElement.value] = true;
       }
       const start = numerals[0];
       const result = Harmony.harmonizeAll({scale, start, constraints, greedy: false, useProgressions: this.useProgressions.nativeElement.checked});

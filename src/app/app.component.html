@@ -24,6 +24,16 @@
         <label>Check progressions: </label>
         <input #useProgressions type="checkbox">
     </div>
+    <div class="d-block">
+        <label>Ending Cadence: </label>
+        <select #endCadence>
+            <option value="">Null</option>
+            <option value="pac">PAC</option>
+            <option value="iac">IAC</option>
+            <option value="hc">HC</option>
+            <option value="dc">DC</option>
+        </select>
+    </div>
     <button (click)="submit()">Submit</button>
 </form>
 <p #error></p>
