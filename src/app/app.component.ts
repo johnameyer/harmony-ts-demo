@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { AbsoluteNote, IncompleteChord, Scale, Harmony, HarmonizedChord, RomanNumeral } from 'harmony-ts';
+import { AbsoluteNote, IncompleteChord, Scale, Harmony, HarmonizedChord, RomanNumeral, Key } from 'harmony-ts';
 
 @Component({
   selector: 'harmony-ts-demo-root',
@@ -24,7 +24,7 @@ export class AppComponent  {
       const soprano = this.soprano.nativeElement.value.split(' ');
       const [key, minor] = this.key.nativeElement.value.split('m');
       numerals[0] = numerals[0] ?? (minor !== undefined ? 'I' : 'i');
-      const scale = minor === undefined ? Scale.transpose(Scale.Major.notes, key) : Scale.transpose(Scale.NaturalMinor.notes, key);
+      const scale = [Key.fromString(key), minor ? Scale.Quality.MINOR : Scale.Quality.MAJOR] as Scale;
       const constraints = new Array(Math.max(numerals.length, soprano.length)).fill(0)
         .map((_, i) => new IncompleteChord({romanNumeral: numerals[i] ? new RomanNumeral(numerals[i], scale) : undefined, voices: soprano[i] ? [new AbsoluteNote(soprano[i]), undefined, undefined, undefined] : undefined}));
       if(this.spacing.nativeElement.value) {
@@ -34,7 +34,7 @@ export class AppComponent  {
         constraints[constraints.length - 1].flags[this.endCadence.nativeElement.value] = true;
       }
       const start = numerals[0];
-      const result = Harmony.harmonizeAll({scale, start, constraints, greedy: false, useProgressions: this.useProgressions.nativeElement.checked});
+      const result = Harmony.harmonizeAll({scale, start, constraints, canModulate: true, greedy: false, useProgressions: this.useProgressions.nativeElement.checked});
 
       if (result.solution) {
         this.error.nativeElement.innerHTML = '';

@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, Input, AfterContentInit, AfterViewChecked, AfterViewInit } from '@angular/core';
-import { HarmonizedChord, AbsoluteNote, IncompleteChord, Scale, Harmony, RomanNumeral, Accidental, ChordQuality, Interval, IntervalQuality } from 'harmony-ts';
+import { HarmonizedChord, AbsoluteNote, IncompleteChord, Scale, Harmony, RomanNumeral, Accidental, ChordQuality, Interval, IntervalQuality, Key } from 'harmony-ts';
 
 import Vex from 'vexflow';
 
@@ -33,16 +33,13 @@ export class SolutionRendererComponent implements AfterViewInit {
 
     console.log(this.result);
 
-    // hacky but works under current scale key system
-    //@ts-ignore
-    const scale = this.result[0].romanNumeral._scale;
-    const key = scale[0];
+    const scale = this.result[0].romanNumeral.scale;
 
     const [sopranoVoice, altoVoice, tenorVoice, bassVoice, text] = this.result
     .reduce((acc, chord) => {
       const map = (note: AbsoluteNote, stem_direction, clef) => {
         const staveNote = vf.StaveNote({ keys: [note.letterName + Accidental.toString(note.accidental) + '/' + note.octavePosition], stem_direction, clef, duration: 'q' });
-        if (scale.indexOf(note.simpleName) == -1) {
+        if (Scale.getNamesOfScale(scale).indexOf(note.simpleName) == -1) {
           //TODO courtesy accidentals
           staveNote.addAccidental(0, vf.Accidental({ type: Accidental.toString(note.accidental) || 'n'}));
         }
@@ -66,6 +63,9 @@ export class SolutionRendererComponent implements AfterViewInit {
         textNote.text += '/' + chord.romanNumeral.applied;
       }
       textNote.text = chord.flags?.sequence ? '(' + textNote.text + ')' : textNote.text;
+      if(chord.flags.pivot) {
+        textNote.text += '(in ' + Key.toString(chord.romanNumeral.scale[0]) + ')';
+      }
       acc[4].push(textNote);
       return acc;
     }, [[], [], [], [], []])
@@ -80,8 +80,8 @@ export class SolutionRendererComponent implements AfterViewInit {
       note.setJustification(Vex.Flow.TextNote.Justification.CENTER);
     });
 
-    system.addStave({ voices: [sopranoVoice, altoVoice] }).addKeySignature(key).addClef('treble').addTimeSignature('4/4');
-    system.addStave({ voices: [tenorVoice, bassVoice, text] }).addKeySignature(key).addClef('bass').addTimeSignature('4/4');
+    system.addStave({ voices: [sopranoVoice, altoVoice] }).addKeySignature(Key.toString(scale[0])).addClef('treble').addTimeSignature('4/4');
+    system.addStave({ voices: [tenorVoice, bassVoice, text] }).addKeySignature(Key.toString(scale[0])).addClef('bass').addTimeSignature('4/4');
 
     system.addConnector().setType(Vex.Flow.StaveConnector.type.BRACE);
     system.addConnector().setType(Vex.Flow.StaveConnector.type.SINGLE_LEFT);
