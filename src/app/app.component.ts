@@ -20,27 +20,33 @@ export class AppComponent  {
 
   submit(): false {
     setTimeout(() => {
-      const numerals = this.chords.nativeElement.value.split(' ');
-      const soprano = this.soprano.nativeElement.value.split(' ');
-      const [key, minor] = this.key.nativeElement.value.split('m');
-      numerals[0] = numerals[0] ?? (minor !== undefined ? 'I' : 'i');
-      const scale = [Key.fromString(key), minor ? Scale.Quality.MINOR : Scale.Quality.MAJOR] as Scale;
-      const constraints = new Array(Math.max(numerals.length, soprano.length)).fill(0)
-        .map((_, i) => new IncompleteChord({romanNumeral: numerals[i] ? new RomanNumeral(numerals[i], scale) : undefined, voices: soprano[i] ? [new AbsoluteNote(soprano[i]), undefined, undefined, undefined] : undefined}));
-      if(this.spacing.nativeElement.value) {
-        constraints[0] = new IncompleteChord({romanNumeral: new RomanNumeral(numerals[0], scale), voices: this.spacing.nativeElement.value.split(' ').map(note => new AbsoluteNote(note))});
-      }
-      if(this.endCadence.nativeElement.value) {
-        constraints[constraints.length - 1].flags[this.endCadence.nativeElement.value] = true;
-      }
-      const start = numerals[0];
-      const result = Harmony.harmonizeAll({scale, start, constraints, canModulate: true, greedy: false, useProgressions: this.useProgressions.nativeElement.checked});
+      try {
+        const numerals = this.chords.nativeElement.value.split(' ');
+        const soprano = this.soprano.nativeElement.value.split(' ');
+        const [key, minor] = this.key.nativeElement.value.split('m');
+        numerals[0] = numerals[0]?.length ? numerals[0] : (minor === undefined ? 'I' : 'i');
+        const scale = [Key.fromString(key), minor === undefined ? Scale.Quality.MAJOR : Scale.Quality.MINOR] as Scale;
+        const constraints = new Array(Math.max(numerals.length, soprano.length)).fill(0)
+          .map((_, i) => new IncompleteChord({romanNumeral: numerals[i] ? new RomanNumeral(numerals[i], scale) : undefined, voices: soprano[i] ? [new AbsoluteNote(soprano[i]), undefined, undefined, undefined] : undefined}));
+        if(this.spacing.nativeElement.value) {
+          constraints[0] = new IncompleteChord({romanNumeral: new RomanNumeral(numerals[0], scale), voices: this.spacing.nativeElement.value.split(' ').map(note => new AbsoluteNote(note))});
+        }
+        if(this.endCadence.nativeElement.value) {
+          constraints[constraints.length - 1].flags[this.endCadence.nativeElement.value] = true;
+        }
+        const start = numerals[0];
+        const result = Harmony.harmonizeAll({scale, start, constraints, canModulate: false, greedy: false, useProgressions: this.useProgressions.nativeElement.checked});
 
-      if (result.solution) {
-        this.error.nativeElement.innerHTML = '';
-        this.results.push(result.solution);
-      } else {
-        this.error.nativeElement.innerHTML = 'Could not find solution for ' + numerals + ' got to ' + numerals[result.furthest] + ' @ ' + result.furthest;
+        console.log(result.solution.map(chord => chord.romanNumeral.scale));
+
+        if (result.solution) {
+          this.error.nativeElement.innerHTML = '';
+          this.results.push(result.solution);
+        } else {
+          this.error.nativeElement.innerHTML = 'Could not find solution for ' + numerals + ' got to ' + numerals[result.furthest] + ' @ ' + result.furthest;
+        }
+      } catch (e) {
+        this.error.nativeElement.innerHTML = 'Error: ' + e;
       }
     }, 0);
     return false;

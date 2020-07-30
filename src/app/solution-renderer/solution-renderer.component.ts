@@ -64,7 +64,7 @@ export class SolutionRendererComponent implements AfterViewInit {
       }
       textNote.text = chord.flags?.sequence ? '(' + textNote.text + ')' : textNote.text;
       if(chord.flags.pivot) {
-        textNote.text += '(in ' + Key.toString(chord.romanNumeral.scale[0]) + ')';
+        textNote.text += '(in ' + Key.toString(chord.romanNumeral.scale[0]) + (chord.romanNumeral.scale[1] === Scale.Quality.MAJOR ? '' : 'm') + ')';
       }
       acc[4].push(textNote);
       return acc;
