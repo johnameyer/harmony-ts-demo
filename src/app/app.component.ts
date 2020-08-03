@@ -35,11 +35,10 @@ export class AppComponent  {
           constraints[constraints.length - 1].flags[this.endCadence.nativeElement.value] = true;
         }
         const start = numerals[0];
-        const result = Harmony.harmonizeAll({scale, start, constraints, canModulate: false, greedy: false, useProgressions: this.useProgressions.nativeElement.checked});
-
-        console.log(result.solution.map(chord => chord.romanNumeral.scale));
+        const result = Harmony.harmonizeAll({scale, start, constraints, canModulate: true, greedy: false, useProgressions: this.useProgressions.nativeElement.checked});
 
         if (result.solution) {
+          console.log(result.solution.map(chord => chord.romanNumeral.scale));
           this.error.nativeElement.innerHTML = '';
           this.results.push(result.solution);
         } else {
