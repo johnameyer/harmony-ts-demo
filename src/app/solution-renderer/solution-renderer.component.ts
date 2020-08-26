@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild, ElementRef, Input, AfterContentInit, AfterViewChecked, AfterViewInit } from '@angular/core';
-import { HarmonizedChord, AbsoluteNote, IncompleteChord, Scale, Harmony, RomanNumeral, Accidental, ChordQuality, Interval, IntervalQuality, Key } from 'harmony-ts';
+import { Component, ViewChild, ElementRef, Input, AfterViewInit } from '@angular/core';
+import { HarmonizedChord, AbsoluteNote, Scale, Accidental, ChordQuality, Interval, IntervalQuality, Key } from 'harmony-ts';
 
 import Vex from 'vexflow';
 

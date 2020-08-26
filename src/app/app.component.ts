@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { AbsoluteNote, IncompleteChord, Scale, Harmony, HarmonizedChord, RomanNumeral, Key } from 'harmony-ts';
+import { AbsoluteNote, IncompleteChord, Scale, Harmonizer, RomanNumeral, Key, PartWritingParameters, defaultPartWritingParameters, PartWriter, flattenResults } from 'harmony-ts';
+import { CompleteChord } from 'harmony-ts/dist/chord/complete-chord';
 
 @Component({
   selector: 'harmony-ts-demo-root',
@@ -7,7 +8,7 @@ import { AbsoluteNote, IncompleteChord, Scale, Harmony, HarmonizedChord, RomanNu
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent  {
-  results: HarmonizedChord[][] = [];
+  results: CompleteChord[][] = [];
   @ViewChild('key') key: ElementRef;
   @ViewChild('chords') chords: ElementRef;
   @ViewChild('soprano') soprano: ElementRef;
@@ -34,15 +35,19 @@ export class AppComponent  {
         if(this.endCadence.nativeElement.value) {
           constraints[constraints.length - 1].flags[this.endCadence.nativeElement.value] = true;
         }
-        const start = numerals[0];
-        const result = Harmony.harmonizeAll({scale, start, constraints, canModulate: true, greedy: false, useProgressions: this.useProgressions.nativeElement.checked});
 
-        if (result.solution) {
-          console.log(result.solution.map(chord => chord.romanNumeral.scale));
+        const harmonizer = new Harmonizer({ canModulate: true, useProgressions: this.useProgressions.nativeElement.checked });
+        const params: PartWritingParameters = defaultPartWritingParameters;
+        const iterator = new PartWriter(undefined, params, harmonizer).voiceAll(constraints, scale);
+
+        const result = flattenResults(iterator).next().value as CompleteChord[];// const result = Harmony.harmonizeAll(params);
+
+        if (result) {
+          console.log(result.map(chord => chord.romanNumeral.scale));
           this.error.nativeElement.innerHTML = '';
-          this.results.push(result.solution);
+          this.results.push(result);
         } else {
-          this.error.nativeElement.innerHTML = 'Could not find solution for ' + numerals + ' got to ' + numerals[result.furthest] + ' @ ' + result.furthest;
+          this.error.nativeElement.innerHTML = 'Could not find solution';
         }
       } catch (e) {
         this.error.nativeElement.innerHTML = 'Error: ' + e;
