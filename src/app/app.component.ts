@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { AbsoluteNote, IncompleteChord, Scale, Harmonizer, RomanNumeral, Key, PartWritingParameters, defaultPartWritingParameters, PartWriter, flattenResults } from 'harmony-ts';
+import { AbsoluteNote, IncompleteChord, Scale, Harmonizer, RomanNumeral, Key, PartWritingParameters, PartWriterParameters, defaultPartWritingParameters, PartWriter, flattenResult } from 'harmony-ts';
 import { CompleteChord } from 'harmony-ts/dist/chord/complete-chord';
 
 @Component({
@@ -38,9 +38,9 @@ export class AppComponent  {
 
         const harmonizer = new Harmonizer({ canModulate: true, useProgressions: this.useProgressions.nativeElement.checked });
         const params: PartWritingParameters = defaultPartWritingParameters;
-        const iterator = new PartWriter(undefined, params, harmonizer).voiceAll(constraints, scale);
+        const iterator = new PartWriter({ yieldOrdering: PartWriterParameters.depthOrdering }, params, harmonizer).voiceAll(constraints, scale);
 
-        const result = flattenResults(iterator).next().value as CompleteChord[];// const result = Harmony.harmonizeAll(params);
+        const result = flattenResult(iterator).next().value as CompleteChord[];// const result = Harmony.harmonizeAll(params);
 
         if (result) {
           console.log(result.map(chord => chord.romanNumeral.scale));
