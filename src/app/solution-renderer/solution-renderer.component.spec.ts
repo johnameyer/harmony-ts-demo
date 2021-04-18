@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { SolutionRendererComponent } from './solution-renderer.component';
 
@@ -6,7 +6,7 @@ describe('SolutionRendererComponent', () => {
   let component: SolutionRendererComponent;
   let fixture: ComponentFixture<SolutionRendererComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ SolutionRendererComponent ]
     })
