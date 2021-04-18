@@ -21,7 +21,7 @@
     "@angular/router": "~9.0.1",
     "@types/vexflow": "^1.2.36",
     "harmony-ts": "^0.13.0",
-    "rxjs": "~6.5.4",
+    "rxjs": "~6.6.7",
     "tone": "^13.8.25",
     "tslib": "^1.10.0",
     "vexflow": "^1.2.93",
