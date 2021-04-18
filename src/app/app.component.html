@@ -12,7 +12,7 @@
     <div class="d-block">
         <label>Enter Soprano Line (optional): </label>
         <input #soprano>
-        <p style="color: grey; font-size: 10pt">For example: C5 B4 C5 D5 E5 F5 E5</p>
+        <p style="color: grey; font-size: 10pt">For example: C5 C#5 D5 C5 B4 C5</p>
     </div>
     <div class="d-block">
         <label>Enter Starting Spacing (optional): </label>
@@ -21,8 +21,20 @@
     </div>
     <p style="color: grey; font-size: 10pt">Note that spacing, if provided, overrides soprano for first chord</p>
     <div class="d-block">
-        <label>Check progressions: </label>
+        <label>Check progressions against known progressions: </label>
         <input #useProgressions type="checkbox">
+    </div>
+    <div class="d-block">
+        <label>Can modulate: </label>
+        <input #canModulate type="checkbox">
+    </div>
+    <div class="d-block">
+        <label>Search mode: </label>
+        <select #search>
+            <option value="default">Default</option>
+            <option value="depth">Depth (Best)</option>
+            <option value="greedy">Greedy (Fastest)</option>
+        </select>
     </div>
     <div class="d-block">
         <label>Ending Cadence: </label>

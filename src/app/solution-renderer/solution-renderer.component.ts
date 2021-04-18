@@ -140,25 +140,25 @@ export class SolutionRendererComponent implements AfterViewInit {
       setTimeout((x, chord) => {
         piano.releaseAll();
         if (chord?.voices[0]) {
-          piano.triggerAttack(chord.voices[0].name);
+          piano.triggerAttack(chord.voices[0].name.replace('##', 'X'));
           this.sopranoVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
           this.sopranoVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
           this.sopranoVoice.draw();
         }
         if (chord?.voices[1]) {
-          piano.triggerAttack(chord.voices[1].name);
+          piano.triggerAttack(chord.voices[1].name.replace('##', 'X'));
           this.altoVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
           this.altoVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
           this.altoVoice.draw();
         }
         if (chord?.voices[2]) {
-          piano.triggerAttack(chord.voices[2].name);
+          piano.triggerAttack(chord.voices[2].name.replace('##', 'X'));
           this.tenorVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
           this.tenorVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
           this.tenorVoice.draw();
         }
         if (chord?.voices[3]) {
-          piano.triggerAttack(chord.voices[3].name);
+          piano.triggerAttack(chord.voices[3].name.replace('##', 'X'));
           this.bassVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
           this.bassVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
           this.bassVoice.draw();

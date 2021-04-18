@@ -14,7 +14,9 @@ export class AppComponent  {
   @ViewChild('soprano') soprano: ElementRef;
   @ViewChild('spacing') spacing: ElementRef;
   @ViewChild('useProgressions') useProgressions: ElementRef;
+  @ViewChild('canModulate') canModulate: ElementRef;
   @ViewChild('endCadence') endCadence: ElementRef;
+  @ViewChild('search') search: ElementRef;
   @ViewChild('error') error: ElementRef;
 
   current: any;
@@ -28,17 +30,22 @@ export class AppComponent  {
         numerals[0] = numerals[0]?.length ? numerals[0] : (minor === undefined ? 'I' : 'i');
         const scale = [Key.fromString(key), minor === undefined ? Scale.Quality.MAJOR : Scale.Quality.MINOR] as Scale;
         const constraints = new Array(Math.max(numerals.length, soprano.length)).fill(0)
-          .map((_, i) => new IncompleteChord({romanNumeral: numerals[i] ? new RomanNumeral(numerals[i], scale) : undefined, voices: soprano[i] ? [new AbsoluteNote(soprano[i]), undefined, undefined, undefined] : undefined}));
+          .map((_, i) => new IncompleteChord({romanNumeral: numerals[i] ? new RomanNumeral(numerals[i], scale) : undefined, voices: soprano[i] ? [AbsoluteNote.fromString(soprano[i]), undefined, undefined, undefined] : undefined}));
         if(this.spacing.nativeElement.value) {
-          constraints[0] = new IncompleteChord({romanNumeral: new RomanNumeral(numerals[0], scale), voices: this.spacing.nativeElement.value.split(' ').map(note => new AbsoluteNote(note))});
+          constraints[0] = new IncompleteChord({romanNumeral: new RomanNumeral(numerals[0], scale), voices: this.spacing.nativeElement.value.split(' ').map(note => AbsoluteNote.fromString(note))});
         }
         if(this.endCadence.nativeElement.value) {
           constraints[constraints.length - 1].flags[this.endCadence.nativeElement.value] = true;
         }
 
-        const harmonizer = new Harmonizer({ canModulate: true, useProgressions: this.useProgressions.nativeElement.checked });
+        const harmonizer = new Harmonizer({ canModulate: this.canModulate.nativeElement.checked, useProgressions: this.useProgressions.nativeElement.checked });
         const params: PartWritingParameters = defaultPartWritingParameters;
-        const iterator = new PartWriter({ yieldOrdering: PartWriterParameters.depthOrdering }, params, harmonizer).voiceAll(constraints, scale);
+        const yieldOrdering = {
+          default: PartWriterParameters.defaultOrdering,
+          depth: PartWriterParameters.depthOrdering,
+          greedy: PartWriterParameters.greedyOrdering
+        }[this.search.nativeElement.value];
+        const iterator = new PartWriter({ yieldOrdering }, params, harmonizer).voiceAll(constraints, scale);
 
         const result = flattenResult(iterator).next().value as CompleteChord[];// const result = Harmony.harmonizeAll(params);
 
