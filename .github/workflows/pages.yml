@@ -14,23 +14,29 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Cache Node Modules
-        uses: actions/cache@v1
+      - name: Get Yarn Cache Directory
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache Yarn
+        uses: actions/cache@v2
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-yarn-
+
       - name: Node ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
 
       - name: Install Dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: Generate
-        run: npm run build -- --prod --base-href "https://johnmeyer.dev/harmony-ts-demo/"
+        run: yarn run build -- --prod --base-href "https://johnmeyer.dev/harmony-ts-demo/"
 
       - name: Commit Files
         run: |
