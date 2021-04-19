@@ -1,6 +1,9 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AbsoluteNote, IncompleteChord, Scale, Harmonizer, RomanNumeral, Key, PartWritingParameters, PartWriterParameters, defaultPartWritingParameters, PartWriter, flattenResult } from 'harmony-ts';
 import { CompleteChord } from 'harmony-ts/dist/chord/complete-chord';
+import { Params, solve } from './solve';
+
+let worker = new Worker('./app.worker', { type: 'module' });
 
 @Component({
   selector: 'harmony-ts-demo-root',
@@ -18,36 +21,33 @@ export class AppComponent  {
   @ViewChild('endCadence') endCadence: ElementRef;
   @ViewChild('search') search: ElementRef;
   @ViewChild('error') error: ElementRef;
+  running: boolean = false;
+  hasWebworker = !!worker;
 
   current: any;
 
+  stop() {
+    worker.terminate();
+    worker = new Worker('./app.worker', { type: 'module' });
+    this.running = false;
+  }
+
   submit(): false {
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
         const numerals = this.chords.nativeElement.value.split(' ');
         const soprano = this.soprano.nativeElement.value.split(' ');
         const [key, minor] = this.key.nativeElement.value.split('m');
         numerals[0] = numerals[0]?.length ? numerals[0] : (minor === undefined ? 'I' : 'i');
-        const scale = [Key.fromString(key), minor === undefined ? Scale.Quality.MAJOR : Scale.Quality.MINOR] as Scale;
-        const constraints = new Array(Math.max(numerals.length, soprano.length)).fill(0)
-          .map((_, i) => new IncompleteChord({romanNumeral: numerals[i] ? new RomanNumeral(numerals[i], scale) : undefined, voices: soprano[i] ? [AbsoluteNote.fromString(soprano[i]), undefined, undefined, undefined] : undefined}));
-        if(this.spacing.nativeElement.value) {
-          constraints[0] = new IncompleteChord({romanNumeral: new RomanNumeral(numerals[0], scale), voices: this.spacing.nativeElement.value.split(' ').map(note => AbsoluteNote.fromString(note))});
-        }
-        if(this.endCadence.nativeElement.value) {
-          constraints[constraints.length - 1].flags[this.endCadence.nativeElement.value] = true;
-        }
+        const canModulate = this.canModulate.nativeElement.checked;
+        const useProgressions = this.useProgressions.nativeElement.checked;
+        const endCadence = this.endCadence.nativeElement.value;
+        const spacing = this.spacing.nativeElement.value;
+        const search = this.search.nativeElement.value;
 
-        const harmonizer = new Harmonizer({ canModulate: this.canModulate.nativeElement.checked, useProgressions: this.useProgressions.nativeElement.checked });
-        const params: PartWritingParameters = defaultPartWritingParameters;
-        const yieldOrdering = {
-          default: PartWriterParameters.defaultOrdering,
-          depth: PartWriterParameters.depthOrdering,
-          greedy: PartWriterParameters.greedyOrdering
-        }[this.search.nativeElement.value];
-        const iterator = new PartWriter({ yieldOrdering }, params, harmonizer).voiceAll(constraints, scale);
-
-        const result = flattenResult(iterator).next().value as CompleteChord[];// const result = Harmony.harmonizeAll(params);
+        this.running = true;
+        const result = await solveAsync({ key, minor, numerals, soprano, canModulate, useProgressions, endCadence, spacing, search });// const result = Harmony.harmonizeAll(params);
+        this.running = false;
 
         if (result) {
           console.log(result.map(chord => chord.romanNumeral.scale));
@@ -61,5 +61,24 @@ export class AppComponent  {
       }
     }, 0);
     return false;
+  }
+}
+
+async function solveAsync(params: Params) {
+  if (typeof Worker !== 'undefined') {
+    return new Promise<ReturnType<typeof solve>>((resolve, reject) => {
+      worker.onmessage = ({ data }) => {
+        console.log(data);
+        if(data.result) {
+          resolve(data.result.map(chord => new CompleteChord(chord.voices.map(AbsoluteNote.fromString), new RomanNumeral(chord.romanNumeral, chord.scale), chord.flags)));
+        } else {
+          reject(data.error);
+        }
+      };
+      worker.postMessage(params);
+    })
+  } else {
+    // Web Workers are not supported in this environment.
+    return solve(params);
   }
 }

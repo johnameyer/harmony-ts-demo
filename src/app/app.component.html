@@ -46,7 +46,8 @@
             <option value="dc">DC</option>
         </select>
     </div>
-    <button (click)="submit()">Submit</button>
+    <button *ngIf="!running" (click)="submit()">Submit</button>
+    <button *ngIf="running && hasWebworker" (click)="stop()">Stop</button>
 </form>
 <p #error></p>
 <ng-container *ngFor="let result of results.slice().reverse()">
