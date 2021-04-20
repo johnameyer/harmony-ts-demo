@@ -46,6 +46,7 @@ export class AppComponent  {
         const search = this.search.nativeElement.value;
 
         this.running = true;
+        this.error.nativeElement.innerHTML = '';
         const result = await solveAsync({ key, minor, numerals, soprano, canModulate, useProgressions, endCadence, spacing, search });// const result = Harmony.harmonizeAll(params);
         this.running = false;
 
@@ -68,9 +69,8 @@ async function solveAsync(params: Params) {
   if (typeof Worker !== 'undefined') {
     return new Promise<ReturnType<typeof solve>>((resolve, reject) => {
       worker.onmessage = ({ data }) => {
-        console.log(data);
-        if(data.result) {
-          resolve(data.result.map(chord => new CompleteChord(chord.voices.map(AbsoluteNote.fromString), new RomanNumeral(chord.romanNumeral, chord.scale), chord.flags)));
+        if(!data.error) {
+          resolve(data.result?.map(chord => new CompleteChord(chord.voices.map(AbsoluteNote.fromString), new RomanNumeral(chord.romanNumeral, chord.scale), chord.flags)));
         } else {
           reject(data.error);
         }
