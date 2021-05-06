@@ -70,7 +70,7 @@ async function solveAsync(params: Params) {
     return new Promise<ReturnType<typeof solve>>((resolve, reject) => {
       worker.onmessage = ({ data }) => {
         if(!data.error) {
-          resolve(data.result?.map(chord => new CompleteChord(chord.voices.map(AbsoluteNote.fromString), new RomanNumeral(chord.romanNumeral, chord.scale), chord.flags)));
+          resolve(data.result?.map(chord => new CompleteChord(chord.voices.map(AbsoluteNote.fromString), RomanNumeral.fromString(chord.romanNumeral, chord.scale), chord.flags)));
         } else {
           reject(data.error);
         }

@@ -15,9 +15,9 @@ export interface Params {
 export function solve({ key, minor, numerals, soprano, canModulate, useProgressions, spacing, endCadence, search }: Params) {
     const scale = [Key.fromString(key), minor === undefined ? Scale.Quality.MAJOR : Scale.Quality.MINOR] as Scale;
     const constraints = new Array(Math.max(numerals.length, soprano.length)).fill(0)
-      .map((_, i) => new IncompleteChord({ romanNumeral: numerals[i] ? new RomanNumeral(numerals[i], scale) : undefined, voices: soprano[i] ? [AbsoluteNote.fromString(soprano[i]), undefined, undefined, undefined] : undefined }));
+      .map((_, i) => new IncompleteChord({ romanNumeral: numerals[i] ? RomanNumeral.fromString(numerals[i], scale) : undefined, voices: soprano[i] ? [AbsoluteNote.fromString(soprano[i]), undefined, undefined, undefined] : undefined }));
     if (spacing) {
-      constraints[0] = new IncompleteChord({ romanNumeral: new RomanNumeral(numerals[0], scale), voices: spacing.split(' ').map(note => AbsoluteNote.fromString(note)) });
+      constraints[0] = new IncompleteChord({ romanNumeral: RomanNumeral.fromString(numerals[0], scale), voices: spacing.split(' ').map(note => AbsoluteNote.fromString(note)) });
     }
     if (endCadence) {
       constraints[constraints.length - 1].flags[endCadence] = true;
@@ -32,6 +32,6 @@ export function solve({ key, minor, numerals, soprano, canModulate, useProgressi
     }[search];
     const iterator = new PartWriter({ yieldOrdering }, params, harmonizer).voiceAll(constraints, scale);
   
-    const result = flattenResult(iterator).next().value as CompleteChord[]; // const result = Harmony.harmonizeAll(params);
+    const result = flattenResult(iterator).next().value as CompleteChord[];
     return result;
   }
