@@ -1,42 +1,34 @@
-name: demo
+name: build
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
-  demo:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [12.x]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
-      - name: Get Yarn Cache Directory
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Cache Yarn
-        uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      - uses: pnpm/action-setup@v2.0.1
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          version: 6.27.1
+          run_install: true
 
       - name: Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
 
       - name: Install Dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm i
 
-      - name: Generate
-        run: yarn run build -- --prod --base-href "https://johnmeyer.dev/harmony-ts-demo/"
+      - name: Build
+        run: pnpm ng build -- --configuration production --base-href 'https://johnmeyer.dev/harmony-ts-demo/'
 
       - name: Commit Files
         run: |
@@ -45,9 +37,10 @@ jobs:
           git config --local user.name "GitHub Action"
           find * -maxdepth 0 ! -name 'dist' -exec rm -r {} \;
           mv dist/* ./
+          touch .nojekyll
           git add -A
-          git commit -m "Update live"
-
+          git commit -m "Update build"
+      
       - name: Push Changes
         uses: ad-m/github-push-action@master
         with:
