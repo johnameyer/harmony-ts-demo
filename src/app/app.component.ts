@@ -3,7 +3,7 @@ import { AbsoluteNote, IncompleteChord, Scale, Harmonizer, RomanNumeral, Key, Pa
 import { CompleteChord } from 'harmony-ts/dist/chord/complete-chord';
 import { Params, solve } from './solve';
 
-let worker = new Worker('./app.worker', { type: 'module' });
+let worker = new Worker(new URL('./app.worker', import.meta.url), { type: 'module' });
 
 @Component({
   selector: 'harmony-ts-demo-root',
@@ -28,7 +28,7 @@ export class AppComponent  {
 
   stop() {
     worker.terminate();
-    worker = new Worker('./app.worker', { type: 'module' });
+    worker = new Worker(new URL('./app.worker', import.meta.url), { type: 'module' });
     this.running = false;
   }
 

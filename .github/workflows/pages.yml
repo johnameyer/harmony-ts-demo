@@ -1,11 +1,11 @@
-name: build
+name: pages
 on:
   push:
     branches:
       - main
 
 jobs:
-  build:
+  pages:
     runs-on: ubuntu-latest
     strategy:
       matrix:
