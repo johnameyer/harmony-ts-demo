@@ -72,12 +72,7 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "harmony-ts-demo:build",
-            "sourceMap": {
-              "scripts": true,
-              "styles": true,
-              "vendor": true
-            }
+            "browserTarget": "harmony-ts-demo:build"
           },
           "configurations": {
             "production": {
@@ -108,20 +103,6 @@
             "scripts": []
           }
         },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json",
-              "tsconfig.worker.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        },
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
@@ -135,6 +116,9 @@
           }
         }
       }
-    }},
-  "defaultProject": "harmony-ts-demo"
+    }
+  },
+  "cli": {
+    "analytics": "e1257aff-448b-49d3-bd94-601fc462bf0a"
+  }
 }
