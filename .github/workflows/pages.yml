@@ -7,9 +7,6 @@ on:
 jobs:
   pages:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [12.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -19,10 +16,12 @@ jobs:
           version: 6.27.1
           run_install: true
 
-      - name: Node ${{ matrix.node-version }}
+      - name: Node Setup
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '18'
+          check-latest: true
+          cache: 'pnpm'
 
       - name: Install Dependencies
         run: pnpm i
