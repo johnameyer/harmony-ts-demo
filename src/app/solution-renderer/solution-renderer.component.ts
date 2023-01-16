@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef, Input, AfterViewInit } from '@angular/core';
-import { HarmonizedChord, AbsoluteNote, Scale, Accidental, ChordQuality, Interval, IntervalQuality, Key } from 'harmony-ts';
+import { HarmonizedChord, AbsoluteNote, Scale, Accidental, ChordQuality, Interval, IntervalQuality, Key, ScaleDegree } from 'harmony-ts';
 
 import Vex from 'vexflow';
 
@@ -37,13 +37,25 @@ export class SolutionRendererComponent implements AfterViewInit {
 
     const scale = this.result[0].romanNumeral.scale;
 
+    const namesOfScale = Scale.getNotesOfScale(scale)
+    const accidentalsInScale = namesOfScale.reduce((agg, item) => ({...agg, [item.letterName]: item.accidental}), {});
+    const runningAccidentals = {
+      'treble': {},
+      'bass': {},
+    }
+
     const [sopranoVoice, altoVoice, tenorVoice, bassVoice, text] = this.result
     .reduce((acc, chord) => {
       const map = (note: AbsoluteNote, stem_direction, clef) => {
         const staveNote = vf.StaveNote({ keys: [note.letterName + Accidental.toString(note.accidental) + '/' + note.octavePosition], stem_direction, clef, duration: 'q' });
-        if (Scale.getNamesOfScale(scale).indexOf(note.simpleName) == -1) {
-          //TODO courtesy accidentals
+        const previousWasAltered = runningAccidentals[clef][note.letterName + note.octavePosition];
+        const currentIsAltered = accidentalsInScale[note.letterName] != note.accidental;
+        if(note.letterName == 'B') {
+          console.log(runningAccidentals, previousWasAltered, currentIsAltered);
+        }
+        if (previousWasAltered || currentIsAltered) {
           staveNote.addAccidental(0, vf.Accidental({ type: Accidental.toString(note.accidental) || 'n'}));
+          runningAccidentals[clef][note.letterName + note.octavePosition] = currentIsAltered;
         }
         return staveNote;
       };
@@ -62,7 +74,7 @@ export class SolutionRendererComponent implements AfterViewInit {
       textNote.superscript += chord.romanNumeral.inversionSymbol[0];
       textNote.subscript += chord.romanNumeral.inversionSymbol[1];
       if(chord.romanNumeral.applied){
-        textNote.text += '/' + chord.romanNumeral.applied;
+        textNote.text += '/' + ScaleDegree.toRomanNumeral(chord.romanNumeral.applied);
       }
       textNote.text = chord.flags?.sequence ? '(' + textNote.text + ')' : textNote.text;
       if(chord.flags.pivot) {
@@ -82,8 +94,9 @@ export class SolutionRendererComponent implements AfterViewInit {
       note.setJustification(Vex.Flow.TextNote.Justification.CENTER);
     });
 
-    system.addStave({ voices: [sopranoVoice, altoVoice] }).addKeySignature(Key.toString(scale[0])).addClef('treble').addTimeSignature('4/4');
-    system.addStave({ voices: [tenorVoice, bassVoice, text] }).addKeySignature(Key.toString(scale[0])).addClef('bass').addTimeSignature('4/4');
+    const scaleName = Scale.toString(scale).replace("M", "");
+    system.addStave({ voices: [sopranoVoice, altoVoice] }).addKeySignature(scaleName).addClef('treble'); //.addTimeSignature('4/4');
+    system.addStave({ voices: [tenorVoice, bassVoice, text] }).addKeySignature(scaleName).addClef('bass'); //.addTimeSignature('4/4');
 
     system.addConnector().setType(Vex.Flow.StaveConnector.type.BRACE);
     system.addConnector().setType(Vex.Flow.StaveConnector.type.SINGLE_LEFT);
@@ -142,30 +155,36 @@ export class SolutionRendererComponent implements AfterViewInit {
     for (let tick = 0; tick <= this.result.length; tick++) {
       setTimeout((x, chord) => {
         this.piano.releaseAll();
+
+        console.log(this.sopranoVoice.tickables[x - 1]);
+
+        this.sopranoVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
         if (chord?.voices[0]) {
           this.piano.triggerAttack(chord.voices[0].name.replace('##', 'X'));
-          this.sopranoVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
           this.sopranoVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
-          this.sopranoVoice.draw();
         }
+        this.sopranoVoice.draw();
+
+        this.altoVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
         if (chord?.voices[1]) {
           this.piano.triggerAttack(chord.voices[1].name.replace('##', 'X'));
-          this.altoVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
           this.altoVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
-          this.altoVoice.draw();
         }
+        this.altoVoice.draw();
+
+        this.tenorVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
         if (chord?.voices[2]) {
           this.piano.triggerAttack(chord.voices[2].name.replace('##', 'X'));
-          this.tenorVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
           this.tenorVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
-          this.tenorVoice.draw();
         }
+        this.tenorVoice.draw();
+
+        this.bassVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
         if (chord?.voices[3]) {
           this.piano.triggerAttack(chord.voices[3].name.replace('##', 'X'));
-          this.bassVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
           this.bassVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
-          this.bassVoice.draw();
         }
+        this.bassVoice.draw();
       }, tick * 1000, tick, this.result[tick]);
     }
   }
