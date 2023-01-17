@@ -18,7 +18,7 @@ specifiers:
   '@types/node': ^12.11.1
   '@types/vexflow': ^1.2.36
   codelyzer: ^6.0.0
-  harmony-ts: ^0.14.0
+  harmony-ts: ^0.14.3
   jasmine-core: ~3.6.0
   jasmine-spec-reporter: ~5.0.0
   karma: ~6.3.17
@@ -45,7 +45,7 @@ dependencies:
   '@angular/platform-browser-dynamic': 15.0.2_35pdmxna5zlo6jyg6u37zetaoe
   '@angular/router': 15.0.2_cfl4nuylbphpadjei2gs2jaq2e
   '@types/vexflow': 1.2.37
-  harmony-ts: 0.14.1
+  harmony-ts: 0.14.3
   rxjs: 6.6.7
   tone: 14.7.77
   tslib: 2.3.1
@@ -4051,8 +4051,8 @@ packages:
       har-schema: 2.0.0
     dev: true
 
-  /harmony-ts/0.14.1:
-    resolution: {integrity: sha512-GVbTeX+8qsiiOjVulHHGvFpZqNMSs6jcz9ss3D2iMiip8YhXSIc7mOcgfjXI5pko/NOVcRdCJit7+Fvl4EqORw==}
+  /harmony-ts/0.14.3:
+    resolution: {integrity: sha512-2h7/5St9UhZEl/stunT6BGqFKjc7IydRFXIinS4OGhM1ejvqHbiYQUnFfdJbNcneYhbvMDaLhDEWtEDfLyyMUg==}
     dev: false
 
   /has-ansi/2.0.0:
