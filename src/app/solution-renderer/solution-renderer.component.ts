@@ -63,7 +63,7 @@ export class SolutionRendererComponent implements AfterViewInit {
       acc[1].push(map(chord.voices[1], -1, 'treble'));
       acc[2].push(map(chord.voices[2], 1, 'bass'));
       acc[3].push(map(chord.voices[3], -1, 'bass'));
-      const textNote: any = vf.TextNote({ text: chord.romanNumeral.name.match('[viVI]+')[0], duration: 'q', superscript: '', subscript: '' });
+      const textNote: any = vf.TextNote({ text: chord.romanNumeral.name.match('[#b]?[viVI]+')[0], duration: 'q', superscript: '', subscript: '' });
       if (chord.romanNumeral.quality == ChordQuality.DIMINISHED) {
         if (chord.romanNumeral.intervals?.find(Interval.ofSize('7'))?.quality == IntervalQuality.MINOR) {
           textNote.superscript = Vex.Flow.unicode['o-with-slash'];

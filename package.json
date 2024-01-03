@@ -20,7 +20,7 @@
     "@angular/platform-browser-dynamic": "^15.0.2",
     "@angular/router": "^15.0.2",
     "@types/vexflow": "^1.2.36",
-    "harmony-ts": "^0.14.3",
+    "harmony-ts": "^0.14.4",
     "rxjs": "~6.6.7",
     "tone": "^14.7.77",
     "tslib": "^2.0.0",
