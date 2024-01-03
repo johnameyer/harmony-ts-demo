@@ -59,6 +59,7 @@ export class AppComponent  {
         }
       } catch (e) {
         this.error.nativeElement.innerHTML = 'Error: ' + e;
+        this.running = false;
       }
     }, 0);
     return false;
