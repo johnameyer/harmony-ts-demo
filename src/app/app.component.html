@@ -1,36 +1,41 @@
-<form>
+
+@if (noWebworker) {
+  <p>Warning! No webworker support is detected for your browser so this will run in the main thread and cause the UI to freeze!</p>
+}
+
+<form id="params" [formGroup]="params">
   <div class="d-block">
     <label>Enter key: </label>
-    <input #key>
+    <input formControlName="key">
     <p style="color: grey; font-size: 10pt">For example: Bm</p>
   </div>
   <div class="d-block">
     <label>Enter Roman Numerals (optional): </label>
-    <input #chords>
+    <input formControlName="numerals">
     <p style="color: grey; font-size: 10pt">For example: I ii65 V V42 I6 V43 I ii42 V65 I</p>
   </div>
   <div class="d-block">
     <label>Enter Soprano Line (optional): </label>
-    <input #soprano>
+    <input formControlName="soprano">
     <p style="color: grey; font-size: 10pt">For example: C5 C#5 D5 C5 B4 C5</p>
   </div>
   <div class="d-block">
     <label>Enter Starting Spacing (optional): </label>
-    <input #spacing>
+    <input formControlName="spacing">
     <p style="color: grey; font-size: 10pt">For example: C5 G4 E4 C4</p>
   </div>
   <p style="color: grey; font-size: 10pt">Note that spacing, if provided, overrides soprano for first chord</p>
   <div class="d-block">
     <label>Check progressions against known progressions: </label>
-    <input #useProgressions type="checkbox">
+    <input formControlName="useProgressions" type="checkbox">
   </div>
   <div class="d-block">
     <label>Can modulate: </label>
-    <input #canModulate type="checkbox">
+    <input formControlName="canModulate" type="checkbox">
   </div>
   <div class="d-block">
     <label>Search mode: </label>
-    <select #search>
+    <select formControlName="search">
       <option value="default">Default</option>
       <option value="depth">Depth (Best)</option>
       <option value="greedy">Greedy (Fastest)</option>
@@ -38,7 +43,7 @@
   </div>
   <div class="d-block">
     <label>Ending Cadence: </label>
-    <select #endCadence>
+    <select formControlName="endCadence">
       <option value="">Null</option>
       <option value="pac">PAC</option>
       <option value="iac">IAC</option>
@@ -46,13 +51,28 @@
       <option value="dc">DC</option>
     </select>
   </div>
-  @if (!running) {
-    <button (click)="submit()">Submit</button>
-  } @else {
+  @if (solver.isRunning() | async) {
     <button (click)="stop()">Stop</button>
+  } @else {
+    <button (click)="submit()">Submit</button>
   }
 </form>
-<p #error></p>
-@for (result of results.slice().reverse(); track result) {
+
+<br>
+
+<form class="d-block">
+  <label>Sample: </label>
+
+  <select #sample>
+    @for(sample of samples; track sample; let i = $index) {
+      <option [value]="i">{{sample.numerals}}</option>
+    }
+  </select>
+
+  <button (click)="selectSample(sample)">Load Parameters</button>
+</form>
+
+<p>{{ solver.getError() | async }}</p>
+@for (result of (results | async); track result) {
   <harmony-ts-demo-solution-renderer [result]="result"></harmony-ts-demo-solution-renderer>
 }
