@@ -157,8 +157,6 @@ export class SolutionRendererComponent implements AfterViewInit {
       setTimeout((x, chord) => {
         this.piano.releaseAll();
 
-        console.log(this.sopranoVoice.tickables[x - 1]);
-
         this.sopranoVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
         if (chord?.voices[0]) {
           this.piano.triggerAttack(chord.voices[0].name.replace('##', 'X'));
