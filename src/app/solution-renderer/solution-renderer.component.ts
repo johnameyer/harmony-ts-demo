@@ -4,9 +4,10 @@ import { HarmonizedChord, AbsoluteNote, Scale, Accidental, ChordQuality, Interva
 import Vex from 'vexflow';
 
 @Component({
-  selector: 'harmony-ts-demo-solution-renderer',
-  templateUrl: './solution-renderer.component.html',
-  styleUrls: ['./solution-renderer.component.scss']
+    selector: 'harmony-ts-demo-solution-renderer',
+    templateUrl: './solution-renderer.component.html',
+    styleUrls: ['./solution-renderer.component.scss'],
+    standalone: true
 })
 export class SolutionRendererComponent implements AfterViewInit {
   

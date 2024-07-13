@@ -15,7 +15,7 @@
       "prefix": "harmony-ts-demo",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser-esbuild",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist",
             "index": "src/index.html",
@@ -72,18 +72,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "harmony-ts-demo:build"
+            "buildTarget": "harmony-ts-demo:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "harmony-ts-demo:build:production"
+              "buildTarget": "harmony-ts-demo:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "harmony-ts-demo:build"
+            "buildTarget": "harmony-ts-demo:build"
           }
         },
         "test": {

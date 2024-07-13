@@ -1,55 +1,58 @@
 <form>
-    <div class="d-block">
-        <label>Enter key: </label>
-        <input #key>
-        <p style="color: grey; font-size: 10pt">For example: Bm</p>
-    </div>
-    <div class="d-block">
-        <label>Enter Roman Numerals (optional): </label>
-        <input #chords>
-        <p style="color: grey; font-size: 10pt">For example: I ii65 V V42 I6 V43 I ii42 V65 I</p>
-    </div>
-    <div class="d-block">
-        <label>Enter Soprano Line (optional): </label>
-        <input #soprano>
-        <p style="color: grey; font-size: 10pt">For example: C5 C#5 D5 C5 B4 C5</p>
-    </div>
-    <div class="d-block">
-        <label>Enter Starting Spacing (optional): </label>
-        <input #spacing>
-        <p style="color: grey; font-size: 10pt">For example: C5 G4 E4 C4</p>
-    </div>
-    <p style="color: grey; font-size: 10pt">Note that spacing, if provided, overrides soprano for first chord</p>
-    <div class="d-block">
-        <label>Check progressions against known progressions: </label>
-        <input #useProgressions type="checkbox">
-    </div>
-    <div class="d-block">
-        <label>Can modulate: </label>
-        <input #canModulate type="checkbox">
-    </div>
-    <div class="d-block">
-        <label>Search mode: </label>
-        <select #search>
-            <option value="default">Default</option>
-            <option value="depth">Depth (Best)</option>
-            <option value="greedy">Greedy (Fastest)</option>
-        </select>
-    </div>
-    <div class="d-block">
-        <label>Ending Cadence: </label>
-        <select #endCadence>
-            <option value="">Null</option>
-            <option value="pac">PAC</option>
-            <option value="iac">IAC</option>
-            <option value="hc">HC</option>
-            <option value="dc">DC</option>
-        </select>
-    </div>
-    <button *ngIf="!running" (click)="submit()">Submit</button>
-    <button *ngIf="running && hasWebworker" (click)="stop()">Stop</button>
+  <div class="d-block">
+    <label>Enter key: </label>
+    <input #key>
+    <p style="color: grey; font-size: 10pt">For example: Bm</p>
+  </div>
+  <div class="d-block">
+    <label>Enter Roman Numerals (optional): </label>
+    <input #chords>
+    <p style="color: grey; font-size: 10pt">For example: I ii65 V V42 I6 V43 I ii42 V65 I</p>
+  </div>
+  <div class="d-block">
+    <label>Enter Soprano Line (optional): </label>
+    <input #soprano>
+    <p style="color: grey; font-size: 10pt">For example: C5 C#5 D5 C5 B4 C5</p>
+  </div>
+  <div class="d-block">
+    <label>Enter Starting Spacing (optional): </label>
+    <input #spacing>
+    <p style="color: grey; font-size: 10pt">For example: C5 G4 E4 C4</p>
+  </div>
+  <p style="color: grey; font-size: 10pt">Note that spacing, if provided, overrides soprano for first chord</p>
+  <div class="d-block">
+    <label>Check progressions against known progressions: </label>
+    <input #useProgressions type="checkbox">
+  </div>
+  <div class="d-block">
+    <label>Can modulate: </label>
+    <input #canModulate type="checkbox">
+  </div>
+  <div class="d-block">
+    <label>Search mode: </label>
+    <select #search>
+      <option value="default">Default</option>
+      <option value="depth">Depth (Best)</option>
+      <option value="greedy">Greedy (Fastest)</option>
+    </select>
+  </div>
+  <div class="d-block">
+    <label>Ending Cadence: </label>
+    <select #endCadence>
+      <option value="">Null</option>
+      <option value="pac">PAC</option>
+      <option value="iac">IAC</option>
+      <option value="hc">HC</option>
+      <option value="dc">DC</option>
+    </select>
+  </div>
+  @if (!running) {
+    <button (click)="submit()">Submit</button>
+  } @else {
+    <button (click)="stop()">Stop</button>
+  }
 </form>
 <p #error></p>
-<ng-container *ngFor="let result of results.slice().reverse()">
-    <harmony-ts-demo-solution-renderer [result]="result"></harmony-ts-demo-solution-renderer>
-</ng-container>
+@for (result of results.slice().reverse(); track result) {
+  <harmony-ts-demo-solution-renderer [result]="result"></harmony-ts-demo-solution-renderer>
+}
