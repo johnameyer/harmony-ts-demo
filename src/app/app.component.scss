@@ -5,3 +5,14 @@ p {
     display: block;
     margin-bottom: 10px;
 }
+
+form {
+    border: 1px black solid;
+    padding: 10px;
+    width: fit-content;
+}
+
+#params input, #params select {
+    margin-left: 10px;
+    float: right;
+}

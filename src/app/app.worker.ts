@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { solve } from "./solve";
+import { solve } from "./solver/solve";
 
 addEventListener('message', ({ data }) => {
   try {
