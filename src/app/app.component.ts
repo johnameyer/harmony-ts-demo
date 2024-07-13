@@ -44,8 +44,6 @@ export class AppComponent {
     return false;
   }
   
-  // V7/ii ii7
-  
   protected noWebworker = typeof Worker === 'undefined';
   
   constructor(protected solver: SolverService) { }

@@ -2,6 +2,7 @@ import { Component, ViewChild, ElementRef, Input, AfterViewInit } from '@angular
 import { HarmonizedChord, AbsoluteNote, Scale, Accidental, ChordQuality, Interval, IntervalQuality, Key, ScaleDegree } from 'harmony-ts';
 
 import Vex from 'vexflow';
+import { init, playNotes, releaseAll } from './player';
 
 @Component({
     selector: 'harmony-ts-demo-solution-renderer',
@@ -14,12 +15,7 @@ export class SolutionRendererComponent implements AfterViewInit {
   @Input('result') result: HarmonizedChord[];
 
   @ViewChild('vexflow') vexflow: ElementRef;
-  sopranoVoice: any;
-  altoVoice: any;
-  tenorVoice: any;
-  bassVoice: any;
-
-  piano: import('tone').Sampler | undefined;
+  voices: Vex.Flow.Voice[];
 
   constructor() { }
 
@@ -103,88 +99,30 @@ export class SolutionRendererComponent implements AfterViewInit {
     system.addConnector().setType(Vex.Flow.StaveConnector.type.SINGLE_LEFT);
     system.addConnector().setType(Vex.Flow.StaveConnector.type.SINGLE_RIGHT);
 
-    this.sopranoVoice = sopranoVoice;
-    this.altoVoice = altoVoice;
-    this.tenorVoice = tenorVoice;
-    this.bassVoice = bassVoice;
+    this.voices = [ sopranoVoice, altoVoice, tenorVoice, bassVoice ];
 
     vf.draw();
   }
 
-  async click() {
-    const Tone = await import('tone');
-    if(this.piano == undefined) {
-      this.piano = new Tone.Sampler({
-        urls: {
-          "A0" : "A0.[mp3|ogg]",
-          "C1" : "C1.[mp3|ogg]",
-          "D#1" : "Ds1.[mp3|ogg]",
-          "F#1" : "Fs1.[mp3|ogg]",
-          "A1" : "A1.[mp3|ogg]",
-          "C2" : "C2.[mp3|ogg]",
-          "D#2" : "Ds2.[mp3|ogg]",
-          "F#2" : "Fs2.[mp3|ogg]",
-          "A2" : "A2.[mp3|ogg]",
-          "C3" : "C3.[mp3|ogg]",
-          "D#3" : "Ds3.[mp3|ogg]",
-          "F#3" : "Fs3.[mp3|ogg]",
-          "A3" : "A3.[mp3|ogg]",
-          "C4" : "C4.[mp3|ogg]",
-          "D#4" : "Ds4.[mp3|ogg]",
-          "F#4" : "Fs4.[mp3|ogg]",
-          "A4" : "A4.[mp3|ogg]",
-          "C5" : "C5.[mp3|ogg]",
-          "D#5" : "Ds5.[mp3|ogg]",
-          "F#5" : "Fs5.[mp3|ogg]",
-          "A5" : "A5.[mp3|ogg]",
-          "C6" : "C6.[mp3|ogg]",
-          "D#6" : "Ds6.[mp3|ogg]",
-          "F#6" : "Fs6.[mp3|ogg]",
-          "A6" : "A6.[mp3|ogg]",
-          "C7" : "C7.[mp3|ogg]",
-          "D#7" : "Ds7.[mp3|ogg]",
-          "F#7" : "Fs7.[mp3|ogg]",
-          "A7" : "A7.[mp3|ogg]",
-          "C8" : "C8.[mp3|ogg]"
-        },
-        "release" : 1,
-        "baseUrl" : "./assets/salamander/"
-      }).toDestination();
-    }
-
-    await Tone.loaded();
+  async play() {
+    await init();
     for (let tick = 0; tick <= this.result.length; tick++) {
       setTimeout((x, chord) => {
-        this.piano.releaseAll();
+        releaseAll();
 
-        this.sopranoVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
-        if (chord?.voices[0]) {
-          this.piano.triggerAttack(chord.voices[0].name.replace('##', 'X'));
-          this.sopranoVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
+        for(let i = 0; i < this.voices.length; i++) {
+          (this.voices[i].getTickables()[x - 1] as Vex.Flow.StaveNote)?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
+          if (chord?.voices[0]) {
+            (this.voices[i].getTickables()[x] as Vex.Flow.StaveNote).setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
+          }
+          (this.voices[i] as any).draw();
         }
-        this.sopranoVoice.draw();
 
-        this.altoVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
-        if (chord?.voices[1]) {
-          this.piano.triggerAttack(chord.voices[1].name.replace('##', 'X'));
-          this.altoVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
+        if(chord !== undefined) {
+          playNotes(chord.voices);
         }
-        this.altoVoice.draw();
-
-        this.tenorVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
-        if (chord?.voices[2]) {
-          this.piano.triggerAttack(chord.voices[2].name.replace('##', 'X'));
-          this.tenorVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
-        }
-        this.tenorVoice.draw();
-
-        this.bassVoice.tickables[x - 1]?.setStyle({ fillStyle: 'black', strokeStyle: 'black' });
-        if (chord?.voices[3]) {
-          this.piano.triggerAttack(chord.voices[3].name.replace('##', 'X'));
-          this.bassVoice.tickables[x].setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
-        }
-        this.bassVoice.draw();
       }, tick * 1000, tick, this.result[tick]);
     }
   }
+  
 }
