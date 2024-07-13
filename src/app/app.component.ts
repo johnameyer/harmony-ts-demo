@@ -2,13 +2,16 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AbsoluteNote, IncompleteChord, Scale, Harmonizer, RomanNumeral, Key, PartWritingParameters, PartWriterParameters, defaultPartWritingParameters, PartWriter, flattenResult } from 'harmony-ts';
 import { CompleteChord } from 'harmony-ts/dist/chord/complete-chord';
 import { Params, solve } from './solve';
+import { SolutionRendererComponent } from './solution-renderer/solution-renderer.component';
 
 let worker = new Worker(new URL('./app.worker', import.meta.url), { type: 'module' });
 
 @Component({
-  selector: 'harmony-ts-demo-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'harmony-ts-demo-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: true,
+    imports: [SolutionRendererComponent]
 })
 export class AppComponent  {
   results: CompleteChord[][] = [];

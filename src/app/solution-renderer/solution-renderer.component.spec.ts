@@ -8,8 +8,8 @@ describe('SolutionRendererComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SolutionRendererComponent ]
-    })
+    imports: [SolutionRendererComponent]
+})
     .compileComponents();
   }));
 
