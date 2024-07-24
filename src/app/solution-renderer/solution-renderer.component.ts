@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef, Input, AfterViewInit } from '@angular/core';
-import { HarmonizedChord, AbsoluteNote, Scale, Accidental, ChordQuality, Interval, IntervalQuality, Key, ScaleDegree } from 'harmony-ts';
+import { AbsoluteNote, Scale, Accidental, ChordQuality, Interval, IntervalQuality, Key, ScaleDegree, CompleteChord } from 'harmony-ts';
 
 import Vex from 'vexflow';
 import { init, playNotes, releaseAll } from './player';
@@ -12,7 +12,7 @@ import { init, playNotes, releaseAll } from './player';
 })
 export class SolutionRendererComponent implements AfterViewInit {
   
-  @Input('result') result: HarmonizedChord[];
+  @Input('result') result: CompleteChord[];
 
   @ViewChild('vexflow') vexflow: ElementRef;
   voices: Vex.Flow.Voice[];
@@ -86,7 +86,7 @@ export class SolutionRendererComponent implements AfterViewInit {
       //@ts-ignore
       note.font = { family: 'Serif', size: 15, weight: '' };
       //@ts-ignore
-      note.setLine(13);
+      note.setLine(11);
       //@ts-ignore
       note.setJustification(Vex.Flow.TextNote.Justification.CENTER);
     });

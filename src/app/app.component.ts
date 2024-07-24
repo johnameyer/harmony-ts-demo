@@ -15,8 +15,9 @@ import { AsyncPipe } from '@angular/common';
 export class AppComponent {
   params = new FormGroup({
     key: new FormControl('C', {nonNullable: true}),
-    numerals: new FormControl('I V64 I6 IV ii65 I64 V I', {nonNullable: true}),
+    numerals: new FormControl('', {nonNullable: true}),
     soprano: new FormControl('', {nonNullable: true}),
+    bass: new FormControl('', {nonNullable: true}),
     spacing: new FormControl('', {nonNullable: true}),
     useProgressions: new FormControl(false, {nonNullable: true}),
     canModulate: new FormControl(false, {nonNullable: true}),
@@ -55,10 +56,11 @@ export class AppComponent {
     
     const numerals = values.numerals.split(' ');
     const soprano = values.soprano.split(' ');
+    const bass = values.bass.split(' ');
     const [key, minor] = values.key.split('m');
     numerals[0] = numerals[0]?.length ? numerals[0] : (minor === undefined ? 'I' : 'i');
     
-    this.solver.solve({ ...values, numerals, soprano, key, minor });
+    this.solver.solve({ ...values, numerals, soprano, bass, key, minor });
     
     return false;
   }
