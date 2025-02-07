@@ -61,12 +61,10 @@ export class SolutionRendererComponent implements AfterViewInit {
       acc[2].push(map(chord.voices[2], 1, 'bass'));
       acc[3].push(map(chord.voices[3], -1, 'bass'));
       const textNote: any = vf.TextNote({ text: chord.romanNumeral.name.match('[#b]?[viVI]+')[0], duration: 'q', superscript: '', subscript: '' });
-      if (chord.romanNumeral.quality == ChordQuality.DIMINISHED) {
-        if (chord.romanNumeral.intervals?.find(Interval.ofSize('7'))?.quality == IntervalQuality.MINOR) {
-          textNote.superscript = Vex.Flow.unicode['o-with-slash'];
-        } else {
-          textNote.superscript = Vex.Flow.unicode.circle;
-        }
+      if(chord.romanNumeral.name.includes('0')) {
+        textNote.superscript = Vex.Flow.unicode['o-with-slash'];
+      } else if(chord.romanNumeral.name.includes('o')) {
+        textNote.superscript = Vex.Flow.unicode.circle;
       }
       textNote.superscript += chord.romanNumeral.inversionSymbol[0];
       textNote.subscript += chord.romanNumeral.inversionSymbol[1];
