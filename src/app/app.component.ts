@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SolutionRendererComponent } from './solution-renderer/solution-renderer.component';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
-import { scan } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SolverService } from './solver/solver.service';
 import { AsyncPipe } from '@angular/common';
+import { CompleteChord } from 'harmony-ts';
 
 @Component({
   selector: 'harmony-ts-demo-root',
@@ -46,11 +47,13 @@ export class AppComponent {
   }
   
   protected noWebworker = typeof Worker === 'undefined';
-  
-  constructor(protected solver: SolverService) { }
-  
-  results = this.solver.getResults().pipe(scan((acc, val) => [val, ...acc.slice()], []));
-  
+
+  results: CompleteChord[][] = [];
+
+  constructor(protected solver: SolverService) {
+    this.solver.getResults().pipe(takeUntilDestroyed()).forEach(result => this.results = [result, ...this.results]);
+  }
+
   submit() {
     const values = this.params.getRawValue();
     
@@ -68,5 +71,9 @@ export class AppComponent {
   stop() {
     this.solver.stop();
     return false;
+  }
+
+  delete(index: number) {
+    this.results.splice(index, 1);
   }
 }

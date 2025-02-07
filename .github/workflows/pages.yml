@@ -9,25 +9,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2.0.1
+      - uses: pnpm/action-setup@v4
         with:
-          version: 6.27.1
+          version: latest
           run_install: true
 
       - name: Node Setup
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           check-latest: true
           cache: 'pnpm'
 
-      - name: Install Dependencies
-        run: pnpm i
-
       - name: Build
-        run: pnpm ng build -- --configuration production --base-href 'https://johnmeyer.dev/harmony-ts-demo/'
+        run: pnpm ng build --configuration production --base-href 'https://johnmeyer.dev/harmony-ts-demo/'
 
       - name: Commit Files
         run: |
@@ -48,4 +45,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Restore
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4

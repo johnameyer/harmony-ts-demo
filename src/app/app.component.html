@@ -80,6 +80,6 @@
 </form>
 
 <p>{{ solver.getError() | async }}</p>
-@for (result of (results | async); track result) {
-  <harmony-ts-demo-solution-renderer [result]="result"></harmony-ts-demo-solution-renderer>
+@for (result of results; track result; let i = $index) {
+  <harmony-ts-demo-solution-renderer [result]="result" (delete)="delete(i)"></harmony-ts-demo-solution-renderer>
 }
