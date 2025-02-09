@@ -3,32 +3,32 @@
   <p>Warning! No webworker support is detected for your browser so this will run in the main thread and cause the UI to freeze!</p>
 }
 
-<form id="params" [formGroup]="params">
+<form id="params" [formGroup]="params" autocapitalize="none" autocomplete="off">
   <div class="d-block">
     <label>Enter key: </label>
-    <input formControlName="key" autocomplete="false" autocapitalize="false">
+    <input formControlName="key">
     <p style="color: grey; font-size: 10pt">For example: Bm</p>
   </div>
   <div class="d-block">
     <label>Enter Roman Numerals (optional): </label>
-    <input formControlName="numerals" autocomplete="false" autocapitalize="false">
+    <input formControlName="numerals">
     <p style="color: grey; font-size: 10pt">For example: I ii65 V V42 I6 vi I64 V I</p>
   </div>
   <div class="d-block">
     <label>Enter Soprano Line (optional): </label>
-    <input formControlName="soprano" autocomplete="false" autocapitalize="false">
+    <input formControlName="soprano">
     <p style="color: grey; font-size: 10pt">For example: C5 C#5 D5 C5 C5 B4 C5</p>
     <p style="color: grey; font-size: 10pt">For example: E F G A G</p>
   </div>
   <div class="d-block">
     <label>Enter Bass Line (optional): </label>
-    <input formControlName="bass" autocomplete="false" autocapitalize="false">
+    <input formControlName="bass">
     <p style="color: grey; font-size: 10pt">For example: C3 C#3 D3 G2</p>
     <p style="color: grey; font-size: 10pt">For example: C B A G</p>
   </div>
   <div class="d-block">
     <label>Enter Starting Spacing (optional): </label>
-    <input formControlName="spacing" autocomplete="false" autocapitalize="false">
+    <input formControlName="spacing">
     <p style="color: grey; font-size: 10pt">For example: C5 G4 E4 C4</p>
   </div>
   <p style="color: grey; font-size: 10pt">Note that spacing, if provided, overrides soprano for first chord</p>
@@ -80,6 +80,6 @@
 </form>
 
 <p>{{ solver.getError() | async }}</p>
-@for (result of (results | async); track result) {
-  <harmony-ts-demo-solution-renderer [result]="result"></harmony-ts-demo-solution-renderer>
+@for (result of results; track result; let i = $index) {
+  <harmony-ts-demo-solution-renderer [result]="result" (delete)="delete(i)"></harmony-ts-demo-solution-renderer>
 }

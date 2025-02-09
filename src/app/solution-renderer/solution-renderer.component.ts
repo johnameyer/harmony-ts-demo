@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, Input, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, AfterViewInit, input, viewChild, output } from '@angular/core';
 import { AbsoluteNote, Scale, Accidental, ChordQuality, Interval, IntervalQuality, Key, ScaleDegree, CompleteChord } from 'harmony-ts';
 
 import Vex from 'vexflow';
@@ -12,17 +12,21 @@ import { init, playNotes, releaseAll } from './player';
 })
 export class SolutionRendererComponent implements AfterViewInit {
   
-  @Input('result') result: CompleteChord[];
+  readonly result = input<CompleteChord[]>(undefined);
 
-  @ViewChild('vexflow') vexflow: ElementRef;
+  readonly vexflow = viewChild<ElementRef>('vexflow');
+
+  readonly delete = output();
+  
   voices: Vex.Flow.Voice[];
 
   constructor() { }
 
   ngAfterViewInit() {
-    this.vexflow.nativeElement.id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const vexflow = this.vexflow();
+    vexflow.nativeElement.id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const vf = new Vex.Flow.Factory({
-      renderer: {elementId: this.vexflow.nativeElement.id, width: 1000, height: 400}
+      renderer: {elementId: vexflow.nativeElement.id, width: 1000, height: 300}
     });
 
     const system = vf.System({
@@ -30,9 +34,10 @@ export class SolutionRendererComponent implements AfterViewInit {
       width: 1000,
     });
 
-    console.log(this.result);
+    const result = this.result();
+    console.log(result);
 
-    const scale = this.result[0].romanNumeral.scale;
+    const scale = result[0].romanNumeral.scale;
 
     const namesOfScale = Scale.getNotesOfScale(scale)
     const accidentalsInScale = namesOfScale.reduce((agg, item) => ({...agg, [item.letterName]: item.accidental}), {});
@@ -41,7 +46,7 @@ export class SolutionRendererComponent implements AfterViewInit {
       'bass': {},
     }
 
-    const [sopranoVoice, altoVoice, tenorVoice, bassVoice, text] = this.result
+    const [sopranoVoice, altoVoice, tenorVoice, bassVoice, text] = result
     .reduce((acc, chord) => {
       const map = (note: AbsoluteNote, stem_direction, clef) => {
         const staveNote = vf.StaveNote({ keys: [note.letterName + Accidental.toString(note.accidental) + '/' + note.octavePosition], stem_direction, clef, duration: 'q' });
@@ -61,12 +66,10 @@ export class SolutionRendererComponent implements AfterViewInit {
       acc[2].push(map(chord.voices[2], 1, 'bass'));
       acc[3].push(map(chord.voices[3], -1, 'bass'));
       const textNote: any = vf.TextNote({ text: chord.romanNumeral.name.match('[#b]?[viVI]+')[0], duration: 'q', superscript: '', subscript: '' });
-      if (chord.romanNumeral.quality == ChordQuality.DIMINISHED) {
-        if (chord.romanNumeral.intervals?.find(Interval.ofSize('7'))?.quality == IntervalQuality.MINOR) {
-          textNote.superscript = Vex.Flow.unicode['o-with-slash'];
-        } else {
-          textNote.superscript = Vex.Flow.unicode.circle;
-        }
+      if(chord.romanNumeral.name.includes('0')) {
+        textNote.superscript = Vex.Flow.unicode['o-with-slash'];
+      } else if(chord.romanNumeral.name.includes('o')) {
+        textNote.superscript = Vex.Flow.unicode.circle;
       }
       textNote.superscript += chord.romanNumeral.inversionSymbol[0];
       textNote.subscript += chord.romanNumeral.inversionSymbol[1];
@@ -106,7 +109,7 @@ export class SolutionRendererComponent implements AfterViewInit {
 
   async play() {
     await init();
-    for (let tick = 0; tick <= this.result.length; tick++) {
+    for (let tick = 0; tick <= this.result().length; tick++) {
       setTimeout((x, chord) => {
         releaseAll();
 
@@ -121,7 +124,7 @@ export class SolutionRendererComponent implements AfterViewInit {
         if(chord !== undefined) {
           playNotes(chord.voices);
         }
-      }, tick * 1000, tick, this.result[tick]);
+      }, tick * 1000, tick, this.result()[tick]);
     }
   }
   
