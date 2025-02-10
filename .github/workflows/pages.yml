@@ -1,0 +1,48 @@
+name: pages
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+          run_install: true
+
+      - name: Node Setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          check-latest: true
+          cache: 'pnpm'
+
+      - name: Build
+        run: pnpm ng build --configuration production --base-href 'https://johnmeyer.dev/harmony-ts-demo/'
+
+      - name: Commit Files
+        run: |
+          git checkout --orphan gh-pages
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          find * -maxdepth 0 ! -name 'dist' -exec rm -r {} \;
+          mv dist/* ./
+          touch .nojekyll
+          git add -A
+          git commit -m "Update build"
+      
+      - name: Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: gh-pages
+          force: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Restore
+        uses: actions/checkout@v4
