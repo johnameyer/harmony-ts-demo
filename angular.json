@@ -102,18 +102,6 @@
             ],
             "scripts": []
           }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "harmony-ts-demo:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "harmony-ts-demo:serve:production"
-            }
-          }
         }
       }
     }
